@@ -224,6 +224,6 @@ def osint_scan(req: OsintRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Sorgu hatası: {str(e)}")
 
-if __name__ == '__main__':
-    # host='0.0.0.0' sayesinde aynı Wi-Fi/Ağdaki tüm cihazlar erişebilir
-    app.run(host='0.0.0.0', port=5000, debug=True)
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)
