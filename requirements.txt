@@ -4,3 +4,4 @@ gunicorn
 requests
 fpdf2
 google-genai
+pydantic
