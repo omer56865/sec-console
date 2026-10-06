@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from fastapi.responses import Response, FileResponse
 from pydantic import BaseModel
 import requests
 import subprocess
@@ -13,6 +13,7 @@ from fpdf import FPDF
 
 app = FastAPI(title="SecConsole Backend API")
 
+# CORS Ayarları
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,6 +22,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ANA SAYFA YÖNLENDİRMESİ (Not Found hatasını çözer)
+@app.get("/")
+def read_root():
+    if os.path.exists("index.html"):
+        return FileResponse("index.html")
+    return {"message": "index.html dosyası bulunamadı."}
+
+# Veri Modelleri
 class CodeScanRequest(BaseModel):
     code: str
     language: str = "python"
@@ -29,7 +38,7 @@ class OsintRequest(BaseModel):
     domain: str
 
 class VtRequest(BaseModel):
-    resource: str  # Hash veya IP adresi
+    resource: str
     api_key: str = ""
 
 class AiFixRequest(BaseModel):
@@ -41,6 +50,7 @@ class PdfExportRequest(BaseModel):
     issues: list
     code: str
 
+# Türkçe Karakter Düzeltici (PDF İçin)
 def tr_fix(text: str) -> str:
     mapping = {
         'ğ': 'g', 'Ğ': 'G',
@@ -54,7 +64,7 @@ def tr_fix(text: str) -> str:
         text = text.replace(tr, en)
     return text
 
-# 1. KOD GÜVENLİĞİ (Bandit)
+# 1. SAST KOD ANALİZİ (Bandit)
 @app.post("/api/scan-code")
 def scan_code(req: CodeScanRequest):
     if not req.code.strip():
@@ -98,7 +108,6 @@ def scan_virustotal(req: VtRequest):
     resource = req.resource.strip()
     headers = {"x-apikey": api_key}
     
-    # Hash veya IP sorgusu tespiti
     url = f"https://www.virustotal.com/api/v3/files/{resource}" if len(resource) in [32, 40, 64] else f"https://www.virustotal.com/api/v3/ip_addresses/{resource}"
 
     try:
@@ -121,7 +130,7 @@ def scan_virustotal(req: VtRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"VT Bağlantı Hatası: {str(e)}")
 
-# 3. AI OTO ONARIM (Gemini)
+# 3. AI OTO ONARIM (Gemini 2.5 Flash)
 @app.post("/api/fix-code")
 def fix_code_with_ai(req: AiFixRequest):
     if not req.code.strip():
@@ -198,7 +207,7 @@ def export_pdf_report(req: PdfExportRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"PDF Oluşturma Hatası: {str(e)}")
 
-# 5. OSINT (Shodan)
+# 5. OSINT (Shodan InternetDB)
 @app.post("/api/osint")
 def osint_scan(req: OsintRequest):
     domain = req.domain.replace("https://", "").replace("http://", "").strip().split("/")[0]
@@ -226,4 +235,4 @@ def osint_scan(req: OsintRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
