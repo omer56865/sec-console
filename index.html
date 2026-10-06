@@ -3,366 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecConsole - Security Operations Center</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>SecConsole - Security Dashboard</title>
     <style>
         :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --border-color: #30363d;
-            --text-color: #c9d1d9;
-            --accent-color: #58a6ff;
+            --bg-color: #0b0e14;
+            --card-bg: #151b26;
+            --accent-color: #00ff66;
+            --danger-color: #ff3333;
+            --warning-color: #ffcc00;
+            --text-color: #e0e6ed;
+            --border-color: #232d3f;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
         }
 
-        .navbar {
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            margin: 0;
+            font-size: 24px;
         }
 
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-color);
-            margin-bottom: 20px;
-        }
-
-        .card-header {
-            border-bottom: 1px solid var(--border-color);
-            font-weight: bold;
-            background-color: rgba(255, 255, 255, 0.02);
-        }
-
-        .form-control, .form-select {
-            background-color: #0d1117;
-            border: 1px solid var(--border-color);
-            color: #fff;
-        }
-
-        .form-control:focus, .form-select:focus {
-            background-color: #0d1117;
-            color: #fff;
-            border-color: var(--accent-color);
-            box-shadow: none;
-        }
-
-        .btn-custom {
-            background-color: #238636;
-            color: white;
-            border: none;
-        }
-
-        .btn-custom:hover {
-            background-color: #2ea043;
-            color: white;
-        }
-
-        .nav-tabs {
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .nav-tabs .nav-link {
-            color: var(--text-color);
-            border: none;
-        }
-
-        .nav-tabs .nav-link.active {
-            background-color: var(--card-bg);
-            color: var(--accent-color);
-            border-bottom: 2px solid var(--accent-color);
-        }
-
-        pre {
-            background-color: #090d12;
-            padding: 15px;
             border-radius: 6px;
-            border: 1px solid var(--border-color);
-            color: #e6edf3;
-            white-space: pre-wrap;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
-        .badge-HIGH { background-color: #da3633; }
-        .badge-MEDIUM { background-color: #d29922; color: #000; }
-        .badge-LOW { background-color: #3fb950; color: #000; }
+        .card h2 {
+            margin-top: 0;
+            font-size: 18px;
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        textarea, input, select {
+            width: 100%;
+            background-color: #080a0f;
+            border: 1px solid var(--border-color);
+            color: #00ff66;
+            padding: 10px;
+            font-family: monospace;
+            box-sizing: border-box;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        button {
+            background-color: #1a3a2a;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 10px 15px;
+            cursor: pointer;
+            font-family: monospace;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-color);
+            color: #000;
+        }
+
+        .output-box {
+            background-color: #05070a;
+            border: 1px dashed var(--border-color);
+            padding: 10px;
+            min-height: 80px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 13px;
+        }
+
+        .badge {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .badge-HIGH { background-color: var(--danger-color); color: #fff; }
+        .badge-MEDIUM { background-color: var(--warning-color); color: #000; }
+        .badge-LOW { background-color: var(--accent-color); color: #000; }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#"><i class="fa-solid fa-shield-halved text-primary me-2"></i>SecConsole v1.0</a>
-            <span class="navbar-text text-muted small">AI-Powered Security Operations Dashboard</span>
+<div class="container">
+    <header>
+        <h1>> SEC_CONSOLE v1.0</h1>
+        <span>[ STATUS: ONLINE ]</span>
+    </header>
+
+    <!-- SAST TARAMA & AI DÜZELTME -->
+    <div class="grid-2">
+        <div class="card">
+            <h2>[+] Kod Güvenliği (SAST)</h2>
+            <textarea id="codeArea" rows="10" placeholder="Aşağıya Python kodunu yapıştırın..."></textarea>
+            <button onclick="scanCode()">KODU TARA</button>
         </div>
-    </nav>
 
-    <div class="container">
-        <!-- SEKMELER -->
-        <ul class="nav nav-tabs mb-4" id="secTabs" role="tablist">
-            <li class="nav-item">
-                <button class="nav-link active" id="sast-tab" data-bs-toggle="tab" data-bs-target="#sast" type="button"><i class="fa-solid fa-code me-2"></i>SAST Kod Analizi</button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" id="osint-tab" data-bs-toggle="tab" data-bs-target="#osint" type="button"><i class="fa-solid fa-globe me-2"></i>OSINT (Shodan)</button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" id="vt-tab" data-bs-toggle="tab" data-bs-target="#vt" type="button"><i class="fa-solid fa-bug me-2"></i>VirusTotal</button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="secTabsContent">
-            
-            <!-- 1. SAST VE AI SEKMESİ -->
-            <div class="tab-pane fade show active" id="sast" role="tabpanel">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">Python Kod Girdisi</div>
-                            <div class="card-body">
-                                <textarea id="codeArea" class="form-control font-monospace" rows="12" placeholder="Tarama yapılacak Python kodunu buraya yapıştırın..."></textarea>
-                                <button class="btn btn-custom mt-3 w-100" onclick="scanCode()"><i class="fa-solid fa-magnifying-glass me-2"></i>Kodu Tara (Bandit)</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <span>Tarama Sonuçları</span>
-                                <button class="btn btn-sm btn-outline-light" id="pdfBtn" style="display:none;" onclick="exportPDF()"><i class="fa-solid fa-file-pdf me-1"></i>PDF İndir</button>
-                            </div>
-                            <div class="card-body" id="scanResults">
-                                <p class="text-muted text-center mt-4">Henüz bir kod taranmadı.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- AI DÜZELTME ALANI -->
-                <div class="card mt-3">
-                    <div class="card-header">
-                        <i class="fa-solid fa-wand-magic-sparkles text-warning me-2"></i>Gemini AI Otomatik Kod Onarımı
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-md-9">
-                                <input type="password" id="geminiApiKey" class="form-control" placeholder="Gemini API Key girin (Opsiyonel)">
-                            </div>
-                            <div class="col-md-3">
-                                <button class="btn btn-warning w-100" onclick="fixWithAI()"><i class="fa-solid fa-robot me-1"></i>AI ile Düzelt</button>
-                            </div>
-                        </div>
-                        <div id="aiResult"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. OSINT SEKMESİ -->
-            <div class="tab-pane fade" id="osint" role="tabpanel">
-                <div class="card">
-                    <div class="card-header">Domain / IP İstihbarat Taraması</div>
-                    <div class="card-body">
-                        <div class="input-group mb-3">
-                            <input type="text" id="osintTarget" class="form-control" placeholder="Örn: google.com veya 8.8.8.8">
-                            <button class="btn btn-primary" onclick="scanOSINT()"><i class="fa-solid fa-search me-1"></i>Sorgula</button>
-                        </div>
-                        <div id="osintResults"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. VIRUSTOTAL SEKMESİ -->
-            <div class="tab-pane fade" id="vt" role="tabpanel">
-                <div class="card">
-                    <div class="card-header">VirusTotal Hash / IP Sorgusu</div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <input type="password" id="vtApiKey" class="form-control mb-2" placeholder="VirusTotal API Key">
-                            <input type="text" id="vtTarget" class="form-control" placeholder="MD5, SHA256 Hash veya IP adresi girin">
-                        </div>
-                        <button class="btn btn-danger w-100" onclick="scanVT()"><i class="fa-solid fa-virus me-2"></i>Sorgula</button>
-                        <div id="vtResults" class="mt-3"></div>
-                    </div>
-                </div>
-            </div>
-
+        <div class="card">
+            <h2>[=] Tarama Sonuçları</h2>
+            <div id="scanResults" class="output-box">Henüz tarama yapılmadı.</div>
+            <br>
+            <button id="pdfBtn" style="display:none;" onclick="exportPDF()">PDF RAPOR İNDİR</button>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/bootstrap.bundle.min.js"></script>
-    <script>
-        let lastIssues = [];
-        let lastCode = "";
+    <!-- GEMINI AI -->
+    <div class="card">
+        <h2>[*] Gemini AI Otomatik Onarım</h2>
+        <input type="password" id="geminiApiKey" placeholder="Gemini API Key (Opsiyonel)">
+        <button onclick="fixWithAI()">KODU AI İLE DÜZELT</button>
+        <div id="aiResult" class="output-box" style="margin-top: 10px;"></div>
+    </div>
 
-        // 1. SAST KOD TARAMA
-        async function scanCode() {
-            const code = document.getElementById("codeArea").value;
-            const resultsDiv = document.getElementById("scanResults");
-            lastCode = code;
+    <!-- OSINT VE VIRUSTOTAL -->
+    <div class="grid-2">
+        <div class="card">
+            <h2>[?] OSINT / Shodan Sorgusu</h2>
+            <input type="text" id="osintTarget" placeholder="Domain veya IP (Örn: google.com)">
+            <button onclick="scanOSINT()">SORGULA</button>
+            <div id="osintResults" class="output-box" style="margin-top: 10px;"></div>
+        </div>
 
-            if (!code.trim()) {
-                alert("Lütfen kod girin!");
-                return;
-            }
+        <div class="card">
+            <h2>[!] VirusTotal Analiz</h2>
+            <input type="password" id="vtApiKey" placeholder="VT API Key">
+            <input type="text" id="vtTarget" placeholder="Hash veya IP adresi">
+            <button onclick="scanVT()">VIRUSTOTAL TARA</button>
+            <div id="vtResults" class="output-box" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+</div>
 
-            resultsDiv.innerHTML = `<div class="text-center my-3"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Kod taranıyor...</p></div>`;
+<script>
+    let lastIssues = [];
+    let lastCode = "";
 
-            try {
-                const res = await fetch('/api/scan-code', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: code })
-                });
-                const data = await res.json();
+    async function scanCode() {
+        const code = document.getElementById("codeArea").value;
+        const resultsDiv = document.getElementById("scanResults");
+        lastCode = code;
 
-                if (data.status === "success") {
-                    lastIssues = data.issues;
-                    document.getElementById("pdfBtn").style.display = "block";
-                    
-                    if (data.issues_count === 0) {
-                        resultsDiv.innerHTML = `<div class="alert alert-success">Herhangi bir güvenlik zafiyeti bulunamadı!</div>`;
-                        return;
-                    }
+        if (!code.trim()) {
+            alert("Lütfen kod girin!");
+            return;
+        }
 
-                    let html = `<div class="alert alert-danger"><strong>${data.issues_count}</strong> zafiyet tespit edildi:</div><ul class="list-group">`;
-                    data.issues.forEach(i => {
-                        html += `
-                            <li class="list-group-item bg-dark text-light border-secondary">
-                                <span class="badge badge-${i.severity} me-2">${i.severity}</span>
-                                <strong>Satır ${i.line}:</strong> ${i.message} (${i.check_id})
-                            </li>`;
-                    });
-                    html += `</ul>`;
-                    resultsDiv.innerHTML = html;
-                } else {
-                    resultsDiv.innerHTML = `<div class="alert alert-warning">${data.message}</div>`;
+        resultsDiv.innerText = "> Tarama başlatıldı...";
+
+        try {
+            const res = await fetch('/api/scan-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: code })
+            });
+            const data = await res.json();
+
+            if (data.status === "success") {
+                lastIssues = data.issues;
+                document.getElementById("pdfBtn").style.display = "inline-block";
+                
+                if (data.issues_count === 0) {
+                    resultsDiv.innerText = "[+] Zafiyet bulunamadı. Kod temiz!";
+                    return;
                 }
-            } catch (err) {
-                resultsDiv.innerHTML = `<div class="alert alert-danger">Sunucu bağlantı hatası oluştu.</div>`;
-            }
-        }
 
-        // 2. AI DÜZELTME
-        async function fixWithAI() {
-            const apiKey = document.getElementById("geminiApiKey").value;
-            const aiDiv = document.getElementById("aiResult");
-
-            if (!lastCode || lastIssues.length === 0) {
-                alert("Önce kodu tarayıp zafiyet bulmalısınız!");
-                return;
-            }
-
-            aiDiv.innerHTML = `<div class="text-center my-3"><div class="spinner-border text-warning" role="status"></div><p class="mt-2">Gemini AI kodu analiz edip düzeltiyor...</p></div>`;
-
-            try {
-                const res = await fetch('/api/fix-code', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: lastCode, issues: lastIssues, api_key: apiKey })
+                let text = `[!] Toplam ${data.issues_count} Zafiyet Bulundu:\n\n`;
+                data.issues.forEach(i => {
+                    text += `• [${i.severity}] Satır ${i.line}: ${i.message} (${i.check_id})\n`;
                 });
-                const data = await res.json();
-
-                if (data.status === "success") {
-                    aiDiv.innerHTML = `<pre>${data.explanation}</pre>`;
-                } else {
-                    aiDiv.innerHTML = `<div class="alert alert-danger">${data.detail || "AI yanıtı alınamadı."}</div>`;
-                }
-            } catch (err) {
-                aiDiv.innerHTML = `<div class="alert alert-danger">AI servisine erişilemedi.</div>`;
+                resultsDiv.innerText = text;
+            } else {
+                resultsDiv.innerText = "[-] Hata: " + data.message;
             }
+        } catch (err) {
+            resultsDiv.innerText = "[-] Sunucu bağlantı hatası!";
+        }
+    }
+
+    async function fixWithAI() {
+        const apiKey = document.getElementById("geminiApiKey").value;
+        const aiDiv = document.getElementById("aiResult");
+
+        if (!lastCode || lastIssues.length === 0) {
+            alert("Önce kodu tarayıp zafiyet bulmalısınız!");
+            return;
         }
 
-        // 3. PDF İNDİRME
-        async function exportPDF() {
-            try {
-                const res = await fetch('/api/export-pdf', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: lastCode, issues: lastIssues })
-                });
-                const blob = await res.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = "SecConsole_Security_Report.pdf";
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            } catch (err) {
-                alert("PDF indirme hatası oluştu.");
+        aiDiv.innerText = "> AI kod analiz ediliyor...";
+
+        try {
+            const res = await fetch('/api/fix-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: lastCode, issues: lastIssues, api_key: apiKey })
+            });
+            const data = await res.json();
+
+            if (data.status === "success") {
+                aiDiv.innerText = data.explanation;
+            } else {
+                aiDiv.innerText = "[-] AI Hatası: " + (data.detail || "Yanıt alınamadı.");
             }
+        } catch (err) {
+            aiDiv.innerText = "[-] AI servisine bağlanılamadı.";
         }
+    }
 
-        // 4. OSINT
-        async function scanOSINT() {
-            const domain = document.getElementById("osintTarget").value;
-            const resDiv = document.getElementById("osintResults");
+    async function exportPDF() {
+        try {
+            const res = await fetch('/api/export-pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: lastCode, issues: lastIssues })
+            });
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "SecConsole_Report.pdf";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        } catch (err) {
+            alert("PDF indirme hatası!");
+        }
+    }
 
-            if (!domain) return;
-            resDiv.innerHTML = `<div class="text-center my-3"><div class="spinner-border text-primary"></div></div>`;
+    async function scanOSINT() {
+        const domain = document.getElementById("osintTarget").value;
+        const resDiv = document.getElementById("osintResults");
 
-            try {
-                const res = await fetch('/api/osint', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ domain: domain })
-                });
-                const data = await res.json();
+        if (!domain) return;
+        resDiv.innerText = "> Sorgulanıyor...";
 
-                if (data.status === "success") {
-                    resDiv.innerHTML = `
-                        <div class="mt-3">
-                            <p><strong>IP Adresi:</strong> ${data.ip}</p>
-                            <p><strong>Açık Portlar:</strong> ${data.ports.join(', ') || 'Açık port bulunamadı'}</p>
-                            <p><strong>Hostnames:</strong> ${data.hostnames.join(', ') || 'Yok'}</p>
-                            <p><strong>Zafiyetler (CVEs):</strong> ${data.vulns.join(', ') || 'Bilinen zafiyet yok'}</p>
-                        </div>`;
-                } else {
-                    resDiv.innerHTML = `<div class="alert alert-warning mt-3">Bilgi bulunamadı.</div>`;
-                }
-            } catch (err) {
-                resDiv.innerHTML = `<div class="alert alert-danger mt-3">Sorgu başarısız.</div>`;
+        try {
+            const res = await fetch('/api/osint', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ domain: domain })
+            });
+            const data = await res.json();
+
+            if (data.status === "success") {
+                resDiv.innerText = `IP: ${data.ip}\nPorts: ${data.ports.join(', ')}\nHostnames: ${data.hostnames.join(', ')}\nVulns: ${data.vulns.join(', ')}`;
+            } else {
+                resDiv.innerText = "[-] Sonuç bulunamadı.";
             }
+        } catch (err) {
+            resDiv.innerText = "[-] Sorgu hatası.";
         }
+    }
 
-        // 5. VIRUSTOTAL
-        async function scanVT() {
-            const apiKey = document.getElementById("vtApiKey").value;
-            const target = document.getElementById("vtTarget").value;
-            const resDiv = document.getElementById("vtResults");
+    async function scanVT() {
+        const apiKey = document.getElementById("vtApiKey").value;
+        const target = document.getElementById("vtTarget").value;
+        const resDiv = document.getElementById("vtResults");
 
-            if (!target) return;
-            resDiv.innerHTML = `<div class="text-center my-3"><div class="spinner-border text-danger"></div></div>`;
+        if (!target) return;
+        resDiv.innerText = "> VirusTotal sorgulanıyor...";
 
-            try {
-                const res = await fetch('/api/virustotal', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ resource: target, api_key: apiKey })
-                });
-                const data = await res.json();
+        try {
+            const res = await fetch('/api/virustotal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resource: target, api_key: apiKey })
+            });
+            const data = await res.json();
 
-                if (data.status === "success") {
-                    resDiv.innerHTML = `
-                        <div class="alert alert-info">
-                            <h5>VirusTotal Tespiti</h5>
-                            <p>🔴 Zararlı (Malicious): ${data.malicious}</p>
-                            <p>🟡 Şüpheli (Suspicious): ${data.suspicious}</p>
-                            <p>🟢 Temiz (Harmless): ${data.harmless}</p>
-                            <p>Repütasyon Skoru: ${data.reputation}</p>
-                        </div>`;
-                } else {
-                    resDiv.innerHTML = `<div class="alert alert-warning">${data.message || data.detail}</div>`;
-                }
-            } catch (err) {
-                resDiv.innerHTML = `<div class="alert alert-danger">VT sorgulama hatası.</div>`;
+            if (data.status === "success") {
+                resDiv.innerText = `Zararlı (Malicious): ${data.malicious}\nŞüpheli (Suspicious): ${data.suspicious}\nTemiz (Harmless): ${data.harmless}\nRepütasyon: ${data.reputation}`;
+            } else {
+                resDiv.innerText = "[-] " + (data.message || data.detail);
             }
+        } catch (err) {
+            resDiv.innerText = "[-] VT bağlantı hatası.";
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>
